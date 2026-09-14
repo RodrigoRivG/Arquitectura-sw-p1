@@ -1,0 +1,31 @@
+[Sun Sep  6 16:41:30 2026] PHP 8.5.9 Development Server (http://localhost:8000) started
+[Sun Sep  6 16:41:31 2026] [::1]:53934 Accepted
+[Sun Sep  6 16:41:31 2026] [::1]:53934 [200]: GET /index.php?controller=categoria&action=listar
+[Sun Sep  6 16:41:31 2026] [::1]:53934 Closing
+[Sun Sep  6 16:45:11 2026] [::1]:49874 Accepted
+[Sun Sep  6 16:45:11 2026] [::1]:49874 [200]: GET /index.php?controller=rutina&action=crear
+[Sun Sep  6 16:45:11 2026] [::1]:49874 Closing
+[Sun Sep  6 16:45:11 2026] [::1]:56054 Accepted
+[Sun Sep  6 16:45:11 2026] [::1]:56054 [200]: GET /assets/css/estilos.css
+[Sun Sep  6 16:45:11 2026] [::1]:56054 Closing
+[Sun Sep  6 16:46:40 2026] [::1]:60943 Accepted
+[Sun Sep  6 16:46:41 2026] [::1]:60943 [302]: POST /index.php?controller=rutina&action=crear
+[Sun Sep  6 16:46:41 2026] [::1]:60943 Closing
+[Sun Sep  6 16:46:41 2026] [::1]:54447 Accepted
+[Sun Sep  6 16:46:41 2026] [::1]:54447 [200]: GET /index.php?controller=rutina&action=listar
+[Sun Sep  6 16:46:41 2026] [::1]:54447 Closing
+[Sun Sep  6 16:46:41 2026] [::1]:49956 Accepted
+[Sun Sep  6 16:46:41 2026] [::1]:49956 [200]: GET /assets/css/estilos.css
+[Sun Sep  6 16:46:41 2026] [::1]:49956 Closing
+[Sun Sep  6 16:47:56 2026] [::1]:50997 Accepted
+[Sun Sep  6 16:47:56 2026] [::1]:50997 [200]: GET /index.php?controller=rutina&action=listar
+[Sun Sep  6 16:47:56 2026] [::1]:50997 Closing
+[Sun Sep  6 16:47:56 2026] [::1]:64889 Accepted
+[Sun Sep  6 16:47:56 2026] [::1]:64889 [200]: GET /assets/css/estilos.css
+[Sun Sep  6 16:47:56 2026] [::1]:64889 Closing
+[Sun Sep  6 16:47:58 2026] [::1]:56106 Accepted
+[Sun Sep  6 16:47:58 2026] [::1]:56106 [200]: GET /index.php?controller=rutina&action=listar
+[Sun Sep  6 16:47:58 2026] [::1]:56106 Closing
+[Sun Sep  6 16:47:58 2026] [::1]:61748 Accepted
+[Sun Sep  6 16:47:58 2026] [::1]:61748 [200]: GET /assets/css/estilos.css
+[Sun Sep  6 16:47:58 2026] [::1]:61748 Closing
