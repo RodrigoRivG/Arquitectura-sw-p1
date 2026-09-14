@@ -24,20 +24,6 @@ class RutinaEjercicio extends Model
         return $stmt->fetchAll();
     }
 
-    public function ejerciciosDisponibles(int $rutinaId): array
-    {
-        $stmt = $this->db->prepare(
-            'SELECT id, nombre FROM ejercicio
-             WHERE id NOT IN (
-                 SELECT ejercicio_id FROM rutina_ejercicio WHERE rutina_id = :rutina_id
-             )
-             ORDER BY nombre'
-        );
-        $stmt->execute(['rutina_id' => $rutinaId]);
-
-        return $stmt->fetchAll();
-    }
-
     public function asignar(int $rutinaId, int $ejercicioId, ?int $series, ?int $repeticiones, ?int $orden): void
     {
         $stmt = $this->db->prepare(

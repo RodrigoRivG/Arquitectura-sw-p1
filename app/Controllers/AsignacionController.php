@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Core\Controller;
+use App\Models\Ejercicio;
 use App\Models\Rutina;
 use App\Models\RutinaEjercicio;
 use PDOException;
@@ -13,12 +14,14 @@ class AsignacionController extends Controller
 {
     private RutinaEjercicio $asignacion;
     private Rutina $rutina;
+    private Ejercicio $ejercicio;
 
     public function __construct()
     {
         $this->requireAuth();
         $this->asignacion = new RutinaEjercicio();
         $this->rutina = new Rutina();
+        $this->ejercicio = new Ejercicio();
     }
 
     public function gestionar(): void
@@ -78,7 +81,7 @@ class AsignacionController extends Controller
         $this->render('asignaciones/gestionar', [
             'rutina' => $rutina,
             'asignados' => $this->asignacion->seleccionarPorRutina($rutinaId),
-            'disponibles' => $this->asignacion->ejerciciosDisponibles($rutinaId),
+            'disponibles' => $this->ejercicio->ejerciciosDisponibles($rutinaId),
             'error' => $error,
         ]);
     }
@@ -102,7 +105,7 @@ class AsignacionController extends Controller
 
     private function validar(int $rutinaId, array $datos): ?string
     {
-        $disponibles = $this->asignacion->ejerciciosDisponibles($rutinaId);
+        $disponibles = $this->ejercicio->ejerciciosDisponibles($rutinaId);
         $idsDisponibles = array_map('intval', array_column($disponibles, 'id'));
 
         if (!in_array($datos['ejercicio_id'], $idsDisponibles, true)) {

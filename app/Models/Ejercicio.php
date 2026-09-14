@@ -31,6 +31,20 @@ class Ejercicio extends Model
         return $ejercicio === false ? null : $ejercicio;
     }
 
+    public function ejerciciosDisponibles(int $rutinaId): array
+    {
+        $stmt = $this->db->prepare(
+            'SELECT id, nombre FROM ejercicio
+             WHERE id NOT IN (
+                 SELECT ejercicio_id FROM rutina_ejercicio WHERE rutina_id = :rutina_id
+             )
+             ORDER BY nombre'
+        );
+        $stmt->execute(['rutina_id' => $rutinaId]);
+
+        return $stmt->fetchAll();
+    }
+
     public function insertar(string $nombre, ?string $descripcion): int
     {
         $stmt = $this->db->prepare(
