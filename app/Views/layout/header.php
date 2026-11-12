@@ -14,7 +14,7 @@
         <a href="index.php?controller=ejercicio&action=listar">Ejercicios</a>
         <a href="index.php?controller=public&action=index">Ver sitio público</a>
         <a href="index.php?controller=auth&action=logout">
-            Cerrar sesión (<?= htmlspecialchars(\App\Core\Auth::nombreInstructor() ?? '') ?>)
+            Cerrar sesión 
         </a>
     </nav>
 </header>

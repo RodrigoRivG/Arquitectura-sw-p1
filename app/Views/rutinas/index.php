@@ -28,7 +28,6 @@
                 <td><?= htmlspecialchars($rutina['nivel'] ?? '') ?></td>
                 <td><?= htmlspecialchars($rutina['descripcion'] ?? '') ?></td>
                 <td>
-                    <a class="btn btn-small" href="index.php?controller=asignacion&action=gestionar&rutina_id=<?= (int) $rutina['id'] ?>">Ejercicios</a>
                     <a class="btn btn-small" href="index.php?controller=rutina&action=editar&id=<?= (int) $rutina['id'] ?>">Editar</a>
                     <form action="index.php?controller=rutina&action=eliminar&id=<?= (int) $rutina['id'] ?>" method="post" style="display:inline">
                         <button class="btn btn-small btn-danger" type="submit" onclick="return confirm('¿Eliminar esta rutina?')">Eliminar</button>

@@ -24,26 +24,29 @@ class RutinaEjercicio extends Model
         return $stmt->fetchAll();
     }
 
-    public function asignar(int $rutinaId, int $ejercicioId, ?int $series, ?int $repeticiones, ?int $orden): void
+    /**
+     * Deja a la rutina exactamente con los ejercicios recibidos.
+     * $ejercicios: [ejercicio_id => ['series' => ?int, 'repeticiones' => ?int, 'orden' => ?int]]
+     * Se invoca desde Rutina, dentro de la misma transacción que guarda la rutina.
+     */
+    public function reemplazarPorRutina(int $rutinaId, array $ejercicios): void
     {
-        $stmt = $this->db->prepare(
+        $borrar = $this->db->prepare('DELETE FROM rutina_ejercicio WHERE rutina_id = :rutina_id');
+        $borrar->execute(['rutina_id' => $rutinaId]);
+
+        $insertar = $this->db->prepare(
             'INSERT INTO rutina_ejercicio (rutina_id, ejercicio_id, series, repeticiones, orden)
              VALUES (:rutina_id, :ejercicio_id, :series, :repeticiones, :orden)'
         );
-        $stmt->execute([
-            'rutina_id' => $rutinaId,
-            'ejercicio_id' => $ejercicioId,
-            'series' => $series,
-            'repeticiones' => $repeticiones,
-            'orden' => $orden,
-        ]);
-    }
 
-    public function quitar(int $rutinaId, int $ejercicioId): void
-    {
-        $stmt = $this->db->prepare(
-            'DELETE FROM rutina_ejercicio WHERE rutina_id = :rutina_id AND ejercicio_id = :ejercicio_id'
-        );
-        $stmt->execute(['rutina_id' => $rutinaId, 'ejercicio_id' => $ejercicioId]);
+        foreach ($ejercicios as $ejercicioId => $datos) {
+            $insertar->execute([
+                'rutina_id' => $rutinaId,
+                'ejercicio_id' => (int) $ejercicioId,
+                'series' => $datos['series'],
+                'repeticiones' => $datos['repeticiones'],
+                'orden' => $datos['orden'],
+            ]);
+        }
     }
 }

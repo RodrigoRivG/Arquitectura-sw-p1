@@ -43,16 +43,18 @@ Cada CU de gestión consolida el CRUD completo (crear, listar, editar, eliminar)
 
 ### CU-03 | Gestionar rutinas (Instructor)
 
+Cada rutina pertenece a una categoría y se compone de ejercicios del catálogo (CU-04). Relación N a M: un ejercicio puede usarse en varias rutinas y una rutina incluye varios ejercicios; cada asignación (`RutinaEjercicio`) define sus propios `series`/`repeticiones`/`orden`. La asignación de ejercicios **no se gestiona por separado**: se realiza en el mismo formulario de la rutina.
+
 | Campo | Detalle |
 |---|---|
-| Descripción | CRUD completo de rutinas, cada una asociada a una categoría. |
+| Descripción | CRUD completo de rutinas; en el formulario de la rutina se eligen también sus ejercicios del catálogo, con series/repeticiones/orden para esa rutina. |
 | Precondición | Sesión activa; para crear, existe al menos una categoría. |
-| Flujos | Crear · Listar (vista de administración) · Editar · Eliminar (elimina también los ejercicios/videos asociados). |
-| Postcondición | Rutina creada / listada / actualizada / eliminada según el flujo ejecutado. |
+| Flujos | **Crear:** el instructor completa los datos de la rutina y, en el mismo formulario, marca los ejercicios que la componen (puede agregar y quitar libremente antes de guardar, o no incluir ninguno); al guardar se registran la rutina y sus asignaciones juntas. · **Listar** (vista de administración). · **Editar:** el mismo formulario muestra la rutina con sus ejercicios ya asignados; al guardar, la rutina queda exactamente con los ejercicios marcados. · **Eliminar** (elimina también sus asignaciones; los ejercicios permanecen en el catálogo). |
+| Postcondición | Rutina creada / listada / actualizada / eliminada según el flujo ejecutado, con sus asociaciones `RutinaEjercicio` registradas de forma atómica (todo o nada) junto con la rutina. |
 
 ### CU-04 | Gestionar ejercicios (Instructor)
 
-`Ejercicio` es un catálogo reutilizable, independiente de cualquier rutina puntual (ver CU-05).
+`Ejercicio` es un catálogo reutilizable, independiente de cualquier rutina puntual (se asigna a rutinas desde CU-03).
 
 | Campo | Detalle |
 |---|---|
@@ -61,18 +63,7 @@ Cada CU de gestión consolida el CRUD completo (crear, listar, editar, eliminar)
 | Flujos | Crear · Listar · Editar · Eliminar (elimina en cascada sus videos y sus asignaciones a rutinas). |
 | Postcondición | Ejercicio creado / listado / actualizado / eliminado según el flujo ejecutado. |
 
-### CU-05 | Asignar ejercicio a rutina (Instructor)
-
-Relación N a M: un ejercicio del catálogo puede usarse en varias rutinas, y una rutina puede incluir varios ejercicios; cada asignación define sus propios `series`/`repeticiones`/`orden`.
-
-| Campo | Detalle |
-|---|---|
-| Descripción | Asocia y desasocia ejercicios del catálogo a una rutina, definiendo series/repeticiones/orden para esa rutina. |
-| Precondición | Sesión activa; rutina y ejercicio existen (para desasociar, la asociación existe). |
-| Flujos | Asignar ejercicio a rutina · Quitar ejercicio de una rutina (el ejercicio permanece en el catálogo). |
-| Postcondición | Asociación `RutinaEjercicio` creada o eliminada según el flujo ejecutado. |
-
-### CU-06 | Gestionar videos (Instructor)
+### CU-05 | Gestionar videos (Instructor)
 
 | Campo | Detalle |
 |---|---|
@@ -105,14 +96,13 @@ Cada caso de uso se clasifica según el tipo de relación entre tablas que invol
 |---|---|---|---|
 | CU-01 | Iniciar sesión | Simple | Solo `instructor` |
 | CU-02 | Gestionar categorías | Simple | Solo `categoria` |
-| CU-03 | Gestionar rutinas | Medio | `categoria` 1→N `rutina` |
+| CU-03 | Gestionar rutinas | Complejo | `rutina` N↔M `ejercicio` vía `rutina_ejercicio` (además de `categoria` 1→N `rutina`) |
 | CU-04 | Gestionar ejercicios | Simple | Solo `ejercicio` (catálogo propio) |
-| CU-05 | Asignar ejercicio a rutina | Complejo | `rutina` N↔M `ejercicio` vía `rutina_ejercicio` |
-| CU-06 | Gestionar videos | Medio | `ejercicio` 1→N `video` |
+| CU-05 | Gestionar videos | Medio | `ejercicio` 1→N `video` |
 
 ## Resumen de alcance
 
-- **6 casos de uso** en total: acceso (login/logout), y CRUD consolidado de Categoria/Rutina/Ejercicio/Video, más la asignación N a M entre Rutina y Ejercicio.
-- Cubre los tres niveles de complejidad requeridos: **simple** (1 a 1), **medio** (1 a N) y **complejo** (N a M vía `rutina_ejercicio`).
+- **5 casos de uso** en total: acceso (login/logout) y CRUD consolidado de Categoria/Rutina/Ejercicio/Video. La asignación N a M entre Rutina y Ejercicio forma parte del CRUD de Rutina (mismo formulario), no es un caso de uso aparte.
+- Cubre los tres niveles de complejidad requeridos: **simple** (1 a 1), **medio** (1 a N) y **complejo** (N a M vía `rutina_ejercicio`, en CU-03).
 - La **consulta pública** (3 casos de uso adicionales) queda documentada pero fuera del alcance/conteo actual.
 - El detalle visual de las vistas (HTML/CSS) no es objeto de evaluación; sí lo es que cada caso de uso quede correctamente soportado por el flujo Modelo-Vista-Controlador definido en `Arquitectura.md`.

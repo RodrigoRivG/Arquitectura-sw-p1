@@ -5,9 +5,18 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Core\Model;
+use Throwable;
 
 class Rutina extends Model
 {
+    private RutinaEjercicio $rutinaEjercicio;
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->rutinaEjercicio = new RutinaEjercicio();
+    }
+
     public function seleccionar(): array
     {
         $stmt = $this->db->query(
@@ -62,33 +71,66 @@ class Rutina extends Model
         return $stmt->fetchAll();
     }
 
-    public function insertar(string $nombre, ?string $descripcion, ?string $nivel, int $categoriaId): void
+    /**
+     * Registra la rutina y sus ejercicios asignados en una sola transacción.
+     * $ejercicios: [ejercicio_id => ['series' => ?int, 'repeticiones' => ?int, 'orden' => ?int]]
+     */
+    public function insertar(string $nombre, ?string $descripcion, ?string $nivel, int $categoriaId, array $ejercicios): int
     {
-        $stmt = $this->db->prepare(
-            'INSERT INTO rutina (nombre, descripcion, nivel, categoria_id)
-             VALUES (:nombre, :descripcion, :nivel, :categoria_id)'
-        );
-        $stmt->execute([
-            'nombre' => $nombre,
-            'descripcion' => $descripcion,
-            'nivel' => $nivel,
-            'categoria_id' => $categoriaId,
-        ]);
+        $this->db->beginTransaction();
+
+        try {
+            $stmt = $this->db->prepare(
+                'INSERT INTO rutina (nombre, descripcion, nivel, categoria_id)
+                 VALUES (:nombre, :descripcion, :nivel, :categoria_id)
+                 RETURNING id'
+            );
+            $stmt->execute([
+                'nombre' => $nombre,
+                'descripcion' => $descripcion,
+                'nivel' => $nivel,
+                'categoria_id' => $categoriaId,
+            ]);
+            $id = (int) $stmt->fetchColumn();
+
+            $this->rutinaEjercicio->reemplazarPorRutina($id, $ejercicios);
+
+            $this->db->commit();
+        } catch (Throwable $e) {
+            $this->db->rollBack();
+            throw $e;
+        }
+
+        return $id;
     }
 
-    public function actualizar(int $id, string $nombre, ?string $descripcion, ?string $nivel, int $categoriaId): void
+    /**
+     * Actualiza la rutina y reemplaza sus ejercicios asignados en una sola transacción.
+     */
+    public function actualizar(int $id, string $nombre, ?string $descripcion, ?string $nivel, int $categoriaId, array $ejercicios): void
     {
-        $stmt = $this->db->prepare(
-            'UPDATE rutina SET nombre = :nombre, descripcion = :descripcion, nivel = :nivel, categoria_id = :categoria_id
-             WHERE id = :id'
-        );
-        $stmt->execute([
-            'nombre' => $nombre,
-            'descripcion' => $descripcion,
-            'nivel' => $nivel,
-            'categoria_id' => $categoriaId,
-            'id' => $id,
-        ]);
+        $this->db->beginTransaction();
+
+        try {
+            $stmt = $this->db->prepare(
+                'UPDATE rutina SET nombre = :nombre, descripcion = :descripcion, nivel = :nivel, categoria_id = :categoria_id
+                 WHERE id = :id'
+            );
+            $stmt->execute([
+                'nombre' => $nombre,
+                'descripcion' => $descripcion,
+                'nivel' => $nivel,
+                'categoria_id' => $categoriaId,
+                'id' => $id,
+            ]);
+
+            $this->rutinaEjercicio->reemplazarPorRutina($id, $ejercicios);
+
+            $this->db->commit();
+        } catch (Throwable $e) {
+            $this->db->rollBack();
+            throw $e;
+        }
     }
 
     public function eliminar(int $id): void

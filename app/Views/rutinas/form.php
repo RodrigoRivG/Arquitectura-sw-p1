@@ -3,6 +3,8 @@
 <?php
 $rutina = $rutina ?? null;
 $error = $error ?? null;
+$catalogo = $catalogo ?? [];
+$asignados = $asignados ?? [];
 $esEdicion = $rutina !== null && isset($rutina['id']);
 $action = $esEdicion
     ? 'index.php?controller=rutina&action=editar&id=' . (int) $rutina['id']
@@ -48,6 +50,45 @@ $niveles = ['Principiante', 'Intermedio', 'Avanzado'];
         Descripción
         <textarea name="descripcion"><?= htmlspecialchars($rutina['descripcion'] ?? '') ?></textarea>
     </label>
+
+    <h3>Ejercicios de la rutina</h3>
+
+    <?php if (empty($catalogo)): ?>
+        <p>
+            El catálogo de ejercicios está vacío; la rutina se puede guardar sin ejercicios.
+            <a class="btn btn-small" href="index.php?controller=ejercicio&action=crear">Crear ejercicio</a>
+        </p>
+    <?php else: ?>
+        <p>Marque los ejercicios que forman parte de la rutina e indique series, repeticiones y orden.</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Incluir</th>
+                    <th>Ejercicio</th>
+                    <th>Series</th>
+                    <th>Repeticiones</th>
+                    <th>Orden</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($catalogo as $ejercicio): ?>
+                    <?php
+                    $ejId = (int) $ejercicio['id'];
+                    $asignado = $asignados[$ejId] ?? null;
+                    $campo = 'ejercicios[' . $ejId . ']';
+                    ?>
+                    <tr>
+                        <td><input type="checkbox" name="<?= $campo ?>[incluir]" value="1" <?= $asignado !== null ? 'checked' : '' ?>></td>
+                        <td><?= htmlspecialchars($ejercicio['nombre']) ?></td>
+                        <td><input type="number" min="0" name="<?= $campo ?>[series]" value="<?= htmlspecialchars((string) ($asignado['series'] ?? '')) ?>"></td>
+                        <td><input type="number" min="0" name="<?= $campo ?>[repeticiones]" value="<?= htmlspecialchars((string) ($asignado['repeticiones'] ?? '')) ?>"></td>
+                        <td><input type="number" min="0" name="<?= $campo ?>[orden]" value="<?= htmlspecialchars((string) ($asignado['orden'] ?? '')) ?>"></td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    <?php endif; ?>
+
     <button class="btn btn-primary" type="submit">Guardar</button>
     <a class="btn btn-secondary" href="index.php?controller=rutina&action=listar">Cancelar</a>
 </form>
