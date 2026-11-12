@@ -42,15 +42,15 @@ CREATE TABLE rutina_ejercicio (
     PRIMARY KEY (rutina_id, ejercicio_id)
 );
 
+-- Video demostrativo: relación 1 a 1 con ejercicio (cada ejercicio tiene exactamente un video)
 CREATE TABLE video (
     id           SERIAL PRIMARY KEY,
     titulo       VARCHAR(150) NOT NULL,
     url          VARCHAR(500) NOT NULL,
-    ejercicio_id INTEGER NOT NULL REFERENCES ejercicio(id) ON DELETE CASCADE
+    ejercicio_id INTEGER NOT NULL UNIQUE REFERENCES ejercicio(id) ON DELETE CASCADE
 );
 
 -- Índices sobre llaves foráneas (aceleran los JOIN de las consultas de listado)
 CREATE INDEX idx_rutina_categoria_id     ON rutina(categoria_id);
 CREATE INDEX idx_rutina_ejercicio_rutina ON rutina_ejercicio(rutina_id);
 CREATE INDEX idx_rutina_ejercicio_ejerc  ON rutina_ejercicio(ejercicio_id);
-CREATE INDEX idx_video_ejercicio_id      ON video(ejercicio_id);

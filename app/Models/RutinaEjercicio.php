@@ -13,9 +13,11 @@ class RutinaEjercicio extends Model
         $stmt = $this->db->prepare(
             'SELECT ejercicio.id AS ejercicio_id, ejercicio.nombre AS ejercicio_nombre,
                     ejercicio.descripcion AS ejercicio_descripcion,
-                    rutina_ejercicio.series, rutina_ejercicio.repeticiones, rutina_ejercicio.orden
+                    rutina_ejercicio.series, rutina_ejercicio.repeticiones, rutina_ejercicio.orden,
+                    video.titulo AS video_titulo, video.url AS video_url
              FROM rutina_ejercicio
              JOIN ejercicio ON ejercicio.id = rutina_ejercicio.ejercicio_id
+             LEFT JOIN video ON video.ejercicio_id = ejercicio.id
              WHERE rutina_ejercicio.rutina_id = :rutina_id
              ORDER BY rutina_ejercicio.orden NULLS LAST, ejercicio.nombre'
         );

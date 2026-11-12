@@ -30,14 +30,12 @@
             <p><?= htmlspecialchars($ejercicio['ejercicio_descripcion']) ?></p>
         <?php endif; ?>
 
-        <?php if (!empty($ejercicio['videos'])): ?>
+        <?php if (!empty($ejercicio['video_url'])): ?>
             <div class="video-grid">
-                <?php foreach ($ejercicio['videos'] as $video): ?>
-                    <div class="video-card">
-                        <h3><?= htmlspecialchars($video['titulo']) ?></h3>
-                        <?= \App\Core\VideoEmbed::render($video['url']) ?>
-                    </div>
-                <?php endforeach; ?>
+                <div class="video-card">
+                    <h3><?= htmlspecialchars($ejercicio['video_titulo']) ?></h3>
+                    <?= \App\Core\VideoEmbed::render($ejercicio['video_url']) ?>
+                </div>
             </div>
         <?php endif; ?>
     </div>

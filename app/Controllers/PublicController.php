@@ -8,21 +8,18 @@ use App\Core\Controller;
 use App\Models\Categoria;
 use App\Models\Rutina;
 use App\Models\RutinaEjercicio;
-use App\Models\Video;
 
 class PublicController extends Controller
 {
     private Categoria $categoria;
     private Rutina $rutina;
     private RutinaEjercicio $rutinaEjercicio;
-    private Video $video;
 
     public function __construct()
     {
         $this->categoria = new Categoria();
         $this->rutina = new Rutina();
         $this->rutinaEjercicio = new RutinaEjercicio();
-        $this->video = new Video();
     }
 
     public function index(): void
@@ -53,11 +50,6 @@ class PublicController extends Controller
         }
 
         $ejercicios = $this->rutinaEjercicio->seleccionarPorRutina($id);
-
-        foreach ($ejercicios as &$ejercicio) {
-            $ejercicio['videos'] = $this->video->seleccionarPorEjercicio((int) $ejercicio['ejercicio_id']);
-        }
-        unset($ejercicio);
 
         $this->render('public/rutina', [
             'rutina' => $rutina,

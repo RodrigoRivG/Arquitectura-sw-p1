@@ -25,25 +25,17 @@ $action = $esEdicion
         <textarea name="descripcion"><?= htmlspecialchars($ejercicio['descripcion'] ?? '') ?></textarea>
     </label>
 
-    <?php if (!$esEdicion): ?>
-        <fieldset>
-            <legend>Video (opcional)</legend>
-            <label>
-                Título
-                <input type="text" name="video_titulo" value="<?= htmlspecialchars($ejercicio['video_titulo'] ?? '') ?>">
-            </label>
-            <label>
-                URL
-                <input type="url" name="video_url" value="<?= htmlspecialchars($ejercicio['video_url'] ?? '') ?>">
-            </label>
-        </fieldset>
-    <?php else: ?>
-        <p>
-            <a class="btn btn-small" href="index.php?controller=video&action=listar&ejercicio_id=<?= (int) $ejercicio['id'] ?>">
-                Gestionar videos de este ejercicio
-            </a>
-        </p>
-    <?php endif; ?>
+    <fieldset>
+        <legend>Video</legend>
+        <label>
+            Título
+            <input type="text" name="video_titulo" value="<?= htmlspecialchars($ejercicio['video_titulo'] ?? '') ?>" required>
+        </label>
+        <label>
+            URL
+            <input type="url" name="video_url" value="<?= htmlspecialchars($ejercicio['video_url'] ?? '') ?>" required>
+        </label>
+    </fieldset>
 
     <button class="btn btn-primary" type="submit">Guardar</button>
     <a class="btn btn-secondary" href="index.php?controller=ejercicio&action=listar">Cancelar</a>

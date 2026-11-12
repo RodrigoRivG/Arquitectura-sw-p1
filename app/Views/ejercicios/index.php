@@ -15,7 +15,7 @@
         <tr>
             <th>Nombre</th>
             <th>Descripción</th>
-            <th>Videos</th>
+            <th>Video</th>
             <th>Acciones</th>
         </tr>
     </thead>
@@ -25,14 +25,14 @@
                 <td><?= htmlspecialchars($ejercicio['nombre']) ?></td>
                 <td><?= htmlspecialchars($ejercicio['descripcion'] ?? '') ?></td>
                 <td>
-                    <a class="btn btn-small" href="index.php?controller=video&action=listar&ejercicio_id=<?= (int) $ejercicio['id'] ?>">
-                        Ver videos (<?= (int) $ejercicio['total_videos'] ?>)
-                    </a>
+                    <?php if (!empty($ejercicio['video_url'])): ?>
+                        <a href="<?= htmlspecialchars($ejercicio['video_url']) ?>" target="_blank" rel="noopener"><?= htmlspecialchars($ejercicio['video_titulo']) ?></a>
+                    <?php endif; ?>
                 </td>
                 <td>
                     <a class="btn btn-small" href="index.php?controller=ejercicio&action=editar&id=<?= (int) $ejercicio['id'] ?>">Editar</a>
                     <form action="index.php?controller=ejercicio&action=eliminar&id=<?= (int) $ejercicio['id'] ?>" method="post" style="display:inline">
-                        <button class="btn btn-small btn-danger" type="submit" onclick="return confirm('¿Eliminar este ejercicio? También se eliminarán sus videos.')">Eliminar</button>
+                        <button class="btn btn-small btn-danger" type="submit" onclick="return confirm('¿Eliminar este ejercicio? También se eliminará su video.')">Eliminar</button>
                     </form>
                 </td>
             </tr>

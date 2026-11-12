@@ -6,19 +6,16 @@ namespace App\Controllers;
 
 use App\Core\Controller;
 use App\Models\Ejercicio;
-use App\Models\Video;
 use PDOException;
 
 class EjercicioController extends Controller
 {
     private Ejercicio $ejercicio;
-    private Video $video;
 
     public function __construct()
     {
         $this->requireAuth();
         $this->ejercicio = new Ejercicio();
-        $this->video = new Video();
     }
 
     public function listar(): void
@@ -38,12 +35,7 @@ class EjercicioController extends Controller
                 return;
             }
 
-            $id = $this->ejercicio->insertar($datos['nombre'], $datos['descripcion']);
-
-            if ($datos['video_titulo'] !== null) {
-                $this->video->insertar($datos['video_titulo'], $datos['video_url'], $id);
-            }
-
+            $this->ejercicio->insertar($datos['nombre'], $datos['descripcion'], $datos['video_titulo'], $datos['video_url']);
             $this->redirect('index.php?controller=ejercicio&action=listar');
             return;
         }
@@ -63,18 +55,16 @@ class EjercicioController extends Controller
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $nombre = trim((string) ($_POST['nombre'] ?? ''));
-            $descripcion = trim((string) ($_POST['descripcion'] ?? '')) ?: null;
+            $datos = $this->datosDelFormulario();
+            $error = $this->validar($datos);
 
-            if ($nombre === '') {
-                $this->render('ejercicios/form', [
-                    'ejercicio' => ['id' => $id, 'nombre' => $nombre, 'descripcion' => $descripcion],
-                    'error' => 'El nombre es obligatorio.',
-                ]);
+            if ($error !== null) {
+                $datos['id'] = $id;
+                $this->render('ejercicios/form', ['ejercicio' => $datos, 'error' => $error]);
                 return;
             }
 
-            $this->ejercicio->actualizar($id, $nombre, $descripcion);
+            $this->ejercicio->actualizar($id, $datos['nombre'], $datos['descripcion'], $datos['video_titulo'], $datos['video_url']);
             $this->redirect('index.php?controller=ejercicio&action=listar');
             return;
         }
@@ -102,14 +92,11 @@ class EjercicioController extends Controller
 
     private function datosDelFormulario(): array
     {
-        $videoTitulo = trim((string) ($_POST['video_titulo'] ?? ''));
-        $videoUrl = trim((string) ($_POST['video_url'] ?? ''));
-
         return [
             'nombre' => trim((string) ($_POST['nombre'] ?? '')),
             'descripcion' => trim((string) ($_POST['descripcion'] ?? '')) ?: null,
-            'video_titulo' => $videoTitulo !== '' ? $videoTitulo : null,
-            'video_url' => $videoUrl !== '' ? $videoUrl : null,
+            'video_titulo' => trim((string) ($_POST['video_titulo'] ?? '')),
+            'video_url' => trim((string) ($_POST['video_url'] ?? '')),
         ];
     }
 
@@ -119,11 +106,11 @@ class EjercicioController extends Controller
             return 'El nombre es obligatorio.';
         }
 
-        if (($datos['video_titulo'] === null) !== ($datos['video_url'] === null)) {
-            return 'Para agregar un video completá tanto el título como la URL.';
+        if ($datos['video_titulo'] === '' || $datos['video_url'] === '') {
+            return 'El video es obligatorio: completá el título y la URL.';
         }
 
-        if ($datos['video_url'] !== null && !$this->urlValida($datos['video_url'])) {
+        if (!$this->urlValida($datos['video_url'])) {
             return 'La URL del video no es válida.';
         }
 

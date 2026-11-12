@@ -54,23 +54,14 @@ Cada rutina pertenece a una categoría y se compone de ejercicios del catálogo 
 
 ### CU-04 | Gestionar ejercicios (Instructor)
 
-`Ejercicio` es un catálogo reutilizable, independiente de cualquier rutina puntual (se asigna a rutinas desde CU-03).
+`Ejercicio` es un catálogo reutilizable, independiente de cualquier rutina puntual (se asigna a rutinas desde CU-03). Cada ejercicio tiene **exactamente un video** demostrativo, obligatorio (relación 1 a 1). El video **no se gestiona por separado**: se carga en el mismo formulario del ejercicio.
 
 | Campo | Detalle |
 |---|---|
-| Descripción | CRUD completo del catálogo de ejercicios. |
+| Descripción | CRUD completo del catálogo de ejercicios; en el formulario del ejercicio se carga también su video (título y URL). |
 | Precondición | Sesión activa. |
-| Flujos | Crear · Listar · Editar · Eliminar (elimina en cascada sus videos y sus asignaciones a rutinas). |
-| Postcondición | Ejercicio creado / listado / actualizado / eliminado según el flujo ejecutado. |
-
-### CU-05 | Gestionar videos (Instructor)
-
-| Campo | Detalle |
-|---|---|
-| Descripción | CRUD completo de videos demostrativos asociados a un ejercicio. |
-| Precondición | Sesión activa; ejercicio existe. |
-| Flujos | Subir video · Listar videos de un ejercicio · Editar (título/url) · Eliminar. |
-| Postcondición | Video creado / listado / actualizado / eliminado según el flujo ejecutado. |
+| Flujos | **Crear:** el instructor completa los datos del ejercicio y, en el mismo formulario, el título y la URL de su video (obligatorios); al guardar se registran el ejercicio y su video juntos. · **Listar** (con el video de cada ejercicio). · **Editar:** el mismo formulario muestra el ejercicio con su video; al guardar se actualizan ambos. · **Eliminar** (elimina en cascada su video y sus asignaciones a rutinas). |
+| Postcondición | Ejercicio creado / listado / actualizado / eliminado según el flujo ejecutado, con su video registrado de forma atómica (todo o nada) junto con el ejercicio. |
 
 ### Consulta pública (Cliente/Alumno) — fuera de alcance por ahora
 
@@ -80,7 +71,7 @@ Cada rutina pertenece a una categoría y se compone de ejercicios del catálogo 
 |---|---|---|---|---|
 | UC-P1 | Ver rutinas por categoría | Navega el catálogo público de rutinas, filtrable por categoría. | Ninguna (acceso libre). | — |
 | UC-P2 | Ver detalle de rutina | Consulta una rutina con su lista de ejercicios asignados (vía `RutinaEjercicio`). | La rutina existe. | — |
-| UC-P3 | Reproducir video de ejercicio | Reproduce el/los video(s) asociados a un ejercicio. | El ejercicio tiene al menos un video. | — |
+| UC-P3 | Reproducir video de ejercicio | Reproduce el video asociado a un ejercicio. | El ejercicio existe (todo ejercicio tiene su video). | — |
 
 ## Clasificación de complejidad de los casos de uso
 
@@ -88,7 +79,7 @@ Cada caso de uso se clasifica según el tipo de relación entre tablas que invol
 
 | Complejidad | Relación | Criterio |
 |---|---|---|
-| **Simple** | 1 a 1 | Opera sobre una sola tabla, sin recorrer ninguna relación (CRUD directo de una entidad). |
+| **Simple** | 1 a 1 | Opera sobre una sola tabla, o sobre una entidad junto con su único registro asociado (relación 1 a 1). |
 | **Medio** | 1 a N | Involucra una relación de uno a muchos (ej. listar los hijos de un padre, o crear/consultar un registro atravesando esa relación). |
 | **Complejo** | N a M | Involucra una relación muchos a muchos, resuelta mediante una tabla intermedia. |
 
@@ -97,12 +88,11 @@ Cada caso de uso se clasifica según el tipo de relación entre tablas que invol
 | CU-01 | Iniciar sesión | Simple | Solo `instructor` |
 | CU-02 | Gestionar categorías | Simple | Solo `categoria` |
 | CU-03 | Gestionar rutinas | Complejo | `rutina` N↔M `ejercicio` vía `rutina_ejercicio` (además de `categoria` 1→N `rutina`) |
-| CU-04 | Gestionar ejercicios | Simple | Solo `ejercicio` (catálogo propio) |
-| CU-05 | Gestionar videos | Medio | `ejercicio` 1→N `video` |
+| CU-04 | Gestionar ejercicios | Simple | `ejercicio` 1↔1 `video` |
 
 ## Resumen de alcance
 
-- **5 casos de uso** en total: acceso (login/logout) y CRUD consolidado de Categoria/Rutina/Ejercicio/Video. La asignación N a M entre Rutina y Ejercicio forma parte del CRUD de Rutina (mismo formulario), no es un caso de uso aparte.
-- Cubre los tres niveles de complejidad requeridos: **simple** (1 a 1), **medio** (1 a N) y **complejo** (N a M vía `rutina_ejercicio`, en CU-03).
+- **4 casos de uso** en total: acceso (login/logout) y CRUD consolidado de Categoria/Rutina/Ejercicio. La asignación N a M entre Rutina y Ejercicio forma parte del CRUD de Rutina, y el video (1 a 1) forma parte del CRUD de Ejercicio; ninguno es un caso de uso aparte.
+- Niveles de complejidad: **simple** (CU-01, CU-02, CU-04) y **complejo** (N a M vía `rutina_ejercicio`, en CU-03).
 - La **consulta pública** (3 casos de uso adicionales) queda documentada pero fuera del alcance/conteo actual.
 - El detalle visual de las vistas (HTML/CSS) no es objeto de evaluación; sí lo es que cada caso de uso quede correctamente soportado por el flujo Modelo-Vista-Controlador definido en `Arquitectura.md`.
