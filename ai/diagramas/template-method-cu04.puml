@@ -1,0 +1,76 @@
+@startuml template-method-cu04
+title Template Method (GoF) aplicado al CU-04 Gestionar ejercicios
+
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+hide empty members
+
+abstract class Controller <<abstract>> {
+  # render(view, data): void
+  # redirect(url): void
+}
+
+class Ejercicio <<model>> {
+  + buscarPorId(id): ?array
+  + insertar(nombre, descripcion, videoTitulo, videoUrl): int
+  + actualizar(id, nombre, descripcion, videoTitulo, videoUrl): void
+}
+
+abstract class GuardarEjercicio <<ClaseAbstracta>> {
+  # modelo: Ejercicio
+  # ejercicioActual: ?array
+  --
+  + __construct(modelo: Ejercicio)
+  + ejecutar(): void {final}
+  {abstract} # cargarEjercicio(): bool
+  {abstract} # persistir(datos: array): void
+  # leerFormulario(): array
+  # validar(datos: array): ?string
+  # mostrarFormulario(ejercicio, error): void
+  # redirigir(): void
+  - urlValida(url: string): bool
+}
+
+class CrearEjercicio <<ClaseConcreta>> {
+  # cargarEjercicio(): bool
+  # persistir(datos: array): void
+}
+
+class EditarEjercicio <<ClaseConcreta>> {
+  - id: int
+  --
+  + __construct(modelo: Ejercicio, id: int)
+  # cargarEjercicio(): bool
+  # persistir(datos: array): void
+}
+
+class EjercicioController <<Cliente>> {
+  + crear(): void
+  + editar(): void
+}
+
+Controller <|-- GuardarEjercicio
+GuardarEjercicio --> Ejercicio : modelo
+GuardarEjercicio <|-- CrearEjercicio
+GuardarEjercicio <|-- EditarEjercicio
+EjercicioController ..> CrearEjercicio : <<crea>>
+EjercicioController ..> EditarEjercicio : <<crea>>
+
+note right of GuardarEjercicio
+  <b>ejecutar()</b> — MetodoPlantilla
+  ....
+  if (!<i>cargarEjercicio()</i>) return;   ← OperacionPrimitiva1
+  if (GET) { mostrarFormulario(ejercicioActual, null); return; }
+  datos = leerFormulario();
+  error = validar(datos);
+  if (error) { mostrarFormulario(datos, error); return; }
+  <i>persistir(datos)</i>;                ← OperacionPrimitiva2
+  redirigir();
+end note
+
+note bottom of EjercicioController
+  crear():  (new CrearEjercicio($this->ejercicio))->ejecutar();
+  editar(): (new EditarEjercicio($this->ejercicio, $id))->ejecutar();
+end note
+
+@enduml

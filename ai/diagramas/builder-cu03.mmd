@@ -1,0 +1,64 @@
+---
+title: Builder (GoF) aplicado al CU-03 Gestionar rutinas
+---
+classDiagram
+    direction TB
+
+    class RutinaController {
+        <<Cliente>>
+        -armarRutina(categorias, catalogo, rutina, ejercicios) RutinaArmadaBuilder
+    }
+
+    class RutinaDirector {
+        <<Director>>
+        -constructor RutinaBuilder
+        +__construct(constructor RutinaBuilder)
+        +construir(rutina, ejercicios) void
+    }
+
+    class RutinaBuilder {
+        <<abstract>>
+        +reiniciar()* void
+        +construirDatos(nombre, descripcion, nivel, categoriaId)* void
+        +construirEjercicio(ejercicioId, series, repeticiones, orden)* void
+    }
+
+    class RutinaArmadaBuilder {
+        <<ConstructorConcreto>>
+        -resultado RutinaArmada
+        -error ?string
+        -idsCategorias int[]
+        -idsEjercicios int[]
+        +__construct(categorias, catalogo)
+        +reiniciar() void
+        +construirDatos(nombre, descripcion, nivel, categoriaId) void
+        +construirEjercicio(ejercicioId, series, repeticiones, orden) void
+        +obtenerResultado() RutinaArmada
+        +obtenerError() ?string
+    }
+
+    class RutinaArmada {
+        <<Producto>>
+        -nombre string
+        -descripcion ?string
+        -nivel ?string
+        -categoriaId int
+        -ejercicios array
+        +establecerDatos(nombre, descripcion, nivel, categoriaId) void
+        +agregarEjercicio(ejercicioId, series, repeticiones, orden) void
+        +nombre() string
+        +descripcion() ?string
+        +nivel() ?string
+        +categoriaId() int
+        +ejercicios() array
+        +datos() array
+    }
+
+    RutinaController ..> RutinaDirector : «crea»
+    RutinaController ..> RutinaArmadaBuilder : «crea»
+    RutinaDirector o--> RutinaBuilder : constructor
+    RutinaBuilder <|-- RutinaArmadaBuilder
+    RutinaArmadaBuilder --> RutinaArmada
+
+    note for RutinaDirector "construir():\nconstructor.reiniciar()\nconstructor.construirDatos(nombre, descripcion, nivel, categoriaId)\npara todos los ejercicios marcados:\n    constructor.construirEjercicio(id, series, repeticiones, orden)"
+    note for RutinaController "constructor = new RutinaArmadaBuilder(categorias, catalogo)\ndirector = new RutinaDirector(constructor)\ndirector.construir(rutina, ejercicios)\nrutinaArmada = constructor.obtenerResultado()"

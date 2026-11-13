@@ -1,0 +1,79 @@
+@startuml builder-cu03
+title Builder (GoF) aplicado al CU-03 Gestionar rutinas
+
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+hide empty members
+
+class RutinaController <<Cliente>> {
+  - armarRutina(categorias, catalogo, rutina, ejercicios): RutinaArmadaBuilder
+}
+
+class RutinaDirector <<Director>> {
+  - constructor: RutinaBuilder
+  --
+  + __construct(constructor: RutinaBuilder)
+  + construir(rutina: array, ejercicios: array): void
+}
+
+abstract class RutinaBuilder <<Constructor>> {
+  {abstract} + reiniciar(): void
+  {abstract} + construirDatos(nombre, descripcion, nivel, categoriaId): void
+  {abstract} + construirEjercicio(ejercicioId, series, repeticiones, orden): void
+}
+
+class RutinaArmadaBuilder <<ConstructorConcreto>> {
+  - resultado: RutinaArmada
+  - error: ?string
+  - idsCategorias: int[]
+  - idsEjercicios: int[]
+  --
+  + __construct(categorias, catalogo)
+  + reiniciar(): void
+  + construirDatos(nombre, descripcion, nivel, categoriaId): void
+  + construirEjercicio(ejercicioId, series, repeticiones, orden): void
+  + obtenerResultado(): RutinaArmada
+  + obtenerError(): ?string
+}
+
+class RutinaArmada <<Producto>> {
+  - nombre: string
+  - descripcion: ?string
+  - nivel: ?string
+  - categoriaId: int
+  - ejercicios: array
+  --
+  + establecerDatos(nombre, descripcion, nivel, categoriaId): void
+  + agregarEjercicio(ejercicioId, series, repeticiones, orden): void
+  + nombre(): string
+  + descripcion(): ?string
+  + nivel(): ?string
+  + categoriaId(): int
+  + ejercicios(): array
+  + datos(): array
+}
+
+RutinaController ..> RutinaDirector : <<crea>>
+RutinaController ..> RutinaArmadaBuilder : <<crea>>
+RutinaDirector o--> RutinaBuilder : constructor
+RutinaBuilder <|-- RutinaArmadaBuilder
+RutinaArmadaBuilder --> RutinaArmada
+
+note bottom of RutinaDirector
+  <b>construir()</b>
+  ....
+  constructor->reiniciar()
+  constructor->construirDatos(nombre, descripcion, nivel, categoriaId)
+  para todos los ejercicios marcados {
+      constructor->construirEjercicio(id, series, repeticiones, orden)
+  }
+end note
+
+note right of RutinaController
+  $constructor = new RutinaArmadaBuilder($categorias, $catalogo);
+  $director = new RutinaDirector($constructor);
+  $director->construir($rutina, $ejercicios);
+  $rutinaArmada = $constructor->obtenerResultado();
+end note
+
+@enduml

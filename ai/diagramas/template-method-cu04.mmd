@@ -1,0 +1,63 @@
+---
+title: Template Method (GoF) aplicado al CU-04 Gestionar ejercicios
+---
+classDiagram
+    direction TB
+
+    class Controller {
+        <<abstract>>
+        #render(view, data) void
+        #redirect(url) void
+    }
+
+    class Ejercicio {
+        <<model>>
+        +buscarPorId(id) ?array
+        +insertar(nombre, descripcion, videoTitulo, videoUrl) int
+        +actualizar(id, nombre, descripcion, videoTitulo, videoUrl) void
+    }
+
+    class GuardarEjercicio {
+        <<abstract>>
+        #modelo Ejercicio
+        #ejercicioActual ?array
+        +__construct(modelo Ejercicio)
+        +ejecutar() void
+        #cargarEjercicio()* bool
+        #persistir(datos)* void
+        #leerFormulario() array
+        #validar(datos) ?string
+        #mostrarFormulario(ejercicio, error) void
+        #redirigir() void
+        -urlValida(url) bool
+    }
+
+    class CrearEjercicio {
+        <<ClaseConcreta>>
+        #cargarEjercicio() bool
+        #persistir(datos) void
+    }
+
+    class EditarEjercicio {
+        <<ClaseConcreta>>
+        -id int
+        +__construct(modelo Ejercicio, id int)
+        #cargarEjercicio() bool
+        #persistir(datos) void
+    }
+
+    class EjercicioController {
+        <<Cliente>>
+        +crear() void
+        +editar() void
+    }
+
+    Controller <|-- GuardarEjercicio
+    GuardarEjercicio --> Ejercicio : modelo
+    GuardarEjercicio <|-- CrearEjercicio
+    GuardarEjercicio <|-- EditarEjercicio
+    EjercicioController ..> CrearEjercicio : «crea»
+    EjercicioController ..> EditarEjercicio : «crea»
+
+    note for GuardarEjercicio "ejecutar() — MetodoPlantilla (final):\nif (!cargarEjercicio()) return      ← OperacionPrimitiva1\nif (GET) { mostrarFormulario(ejercicioActual, null); return }\ndatos = leerFormulario()\nerror = validar(datos)\nif (error) { mostrarFormulario(datos, error); return }\npersistir(datos)      ← OperacionPrimitiva2\nredirigir()"
+    note for EjercicioController "crear():  new CrearEjercicio(ejercicio).ejecutar()\neditar(): new EditarEjercicio(ejercicio, id).ejecutar()"
