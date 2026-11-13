@@ -78,7 +78,7 @@ $niveles = ['Principiante', 'Intermedio', 'Avanzado'];
                     $campo = 'ejercicios[' . $ejId . ']';
                     ?>
                     <tr>
-                        <td><input type="checkbox" name="<?= $campo ?>[incluir]" value="1" <?= $asignado !== null ? 'checked' : '' ?>></td>
+                        <td><input type="checkbox" name="<?= $campo ?>[ejercicio_id]" value="<?= $ejId ?>" <?= $asignado !== null ? 'checked' : '' ?>></td>
                         <td><?= htmlspecialchars($ejercicio['nombre']) ?></td>
                         <td><input type="number" min="0" name="<?= $campo ?>[series]" value="<?= htmlspecialchars((string) ($asignado['series'] ?? '')) ?>"></td>
                         <td><input type="number" min="0" name="<?= $campo ?>[repeticiones]" value="<?= htmlspecialchars((string) ($asignado['repeticiones'] ?? '')) ?>"></td>

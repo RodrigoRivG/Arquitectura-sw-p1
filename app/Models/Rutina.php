@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Core\Model;
+use App\Patterns\Builder\RutinaArmada;
 use Throwable;
 
 class Rutina extends Model
@@ -72,10 +73,9 @@ class Rutina extends Model
     }
 
     /**
-     * Registra la rutina y sus ejercicios asignados en una sola transacción.
-     * $ejercicios: [ejercicio_id => ['series' => ?int, 'repeticiones' => ?int, 'orden' => ?int]]
+     * Registra la rutina (ya armada por el Builder) y sus ejercicios asignados en una sola transacción.
      */
-    public function insertar(string $nombre, ?string $descripcion, ?string $nivel, int $categoriaId, array $ejercicios): int
+    public function insertar(RutinaArmada $rutina): int
     {
         $this->db->beginTransaction();
 
@@ -86,14 +86,14 @@ class Rutina extends Model
                  RETURNING id'
             );
             $stmt->execute([
-                'nombre' => $nombre,
-                'descripcion' => $descripcion,
-                'nivel' => $nivel,
-                'categoria_id' => $categoriaId,
+                'nombre' => $rutina->nombre(),
+                'descripcion' => $rutina->descripcion(),
+                'nivel' => $rutina->nivel(),
+                'categoria_id' => $rutina->categoriaId(),
             ]);
             $id = (int) $stmt->fetchColumn();
 
-            $this->rutinaEjercicio->reemplazarPorRutina($id, $ejercicios);
+            $this->rutinaEjercicio->reemplazarPorRutina($id, $rutina->ejercicios());
 
             $this->db->commit();
         } catch (Throwable $e) {
@@ -107,7 +107,7 @@ class Rutina extends Model
     /**
      * Actualiza la rutina y reemplaza sus ejercicios asignados en una sola transacción.
      */
-    public function actualizar(int $id, string $nombre, ?string $descripcion, ?string $nivel, int $categoriaId, array $ejercicios): void
+    public function actualizar(int $id, RutinaArmada $rutina): void
     {
         $this->db->beginTransaction();
 
@@ -117,14 +117,14 @@ class Rutina extends Model
                  WHERE id = :id'
             );
             $stmt->execute([
-                'nombre' => $nombre,
-                'descripcion' => $descripcion,
-                'nivel' => $nivel,
-                'categoria_id' => $categoriaId,
+                'nombre' => $rutina->nombre(),
+                'descripcion' => $rutina->descripcion(),
+                'nivel' => $rutina->nivel(),
+                'categoria_id' => $rutina->categoriaId(),
                 'id' => $id,
             ]);
 
-            $this->rutinaEjercicio->reemplazarPorRutina($id, $ejercicios);
+            $this->rutinaEjercicio->reemplazarPorRutina($id, $rutina->ejercicios());
 
             $this->db->commit();
         } catch (Throwable $e) {

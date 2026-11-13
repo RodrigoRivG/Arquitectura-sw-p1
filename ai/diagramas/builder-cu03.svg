@@ -1,0 +1,129 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1760" height="810" viewBox="0 0 1760 810" font-family="Arial, Helvetica, sans-serif" font-size="13">
+  <defs>
+    <marker id="abierta" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="12" markerHeight="12" orient="auto-start-reverse">
+      <path d="M1,1 L11,6 L1,11" fill="none" stroke="#000" stroke-width="1.3"/>
+    </marker>
+  </defs>
+  <rect width="1760" height="810" fill="#fff"/>
+
+  <text x="40" y="34" font-size="20" font-weight="bold">Builder (GoF) aplicado al CU-03 Gestionar rutinas</text>
+
+  <!-- ===== Cliente ===== -->
+  <g transform="translate(40,60)">
+    <rect width="520" height="98" fill="#fff" stroke="#000" stroke-width="1.3"/>
+    <text x="260" y="18" text-anchor="middle" font-size="11" fill="#555">«Cliente»</text>
+    <text x="260" y="38" text-anchor="middle" font-size="15" font-weight="bold">RutinaController</text>
+    <text x="260" y="55" text-anchor="middle" font-size="11" fill="#555">app/Controllers/RutinaController.php</text>
+    <line x1="0" y1="66" x2="520" y2="66" stroke="#000"/>
+    <text x="10" y="86">- armarRutina(categorias, catalogo, rutina, ejercicios): RutinaArmadaBuilder</text>
+  </g>
+
+  <!-- Nota del Cliente -->
+  <line x1="560" y1="101" x2="600" y2="101" stroke="#000" stroke-dasharray="4 3"/>
+  <g transform="translate(600,55)" font-family="Consolas, 'Courier New', monospace" font-size="12">
+    <path d="M0,0 H486 L500,14 V92 H0 Z" fill="#fff" stroke="#000"/>
+    <path d="M486,0 V14 H500" fill="none" stroke="#000"/>
+    <text x="10" y="24">$constructor = new RutinaArmadaBuilder($categorias, $catalogo);</text>
+    <text x="10" y="42">$director = new RutinaDirector($constructor);</text>
+    <text x="10" y="60">$director-&gt;construir($rutina, $ejercicios);</text>
+    <text x="10" y="78">$rutinaArmada = $constructor-&gt;obtenerResultado();</text>
+  </g>
+
+  <!-- Cliente crea al Director y al ConstructorConcreto -->
+  <line x1="290" y1="158" x2="290" y2="268" stroke="#000" stroke-dasharray="6 4" marker-end="url(#abierta)"/>
+  <text x="298" y="218" font-size="11" fill="#555">«crea»</text>
+  <line x1="520" y1="158" x2="758" y2="508" stroke="#000" stroke-dasharray="6 4" marker-end="url(#abierta)"/>
+  <text x="652" y="356" font-size="11" fill="#555">«crea»</text>
+
+  <!-- ===== Director ===== -->
+  <g transform="translate(40,270)">
+    <rect width="520" height="148" fill="#fff" stroke="#000" stroke-width="1.3"/>
+    <text x="260" y="18" text-anchor="middle" font-size="11" fill="#555">«Director»</text>
+    <text x="260" y="38" text-anchor="middle" font-size="15" font-weight="bold">RutinaDirector</text>
+    <text x="260" y="55" text-anchor="middle" font-size="11" fill="#555">app/Patterns/Builder/RutinaDirector.php</text>
+    <line x1="0" y1="66" x2="520" y2="66" stroke="#000"/>
+    <text x="10" y="86">- constructor: RutinaBuilder</text>
+    <line x1="0" y1="98" x2="520" y2="98" stroke="#000"/>
+    <text x="10" y="118">+ __construct(constructor: RutinaBuilder)</text>
+    <text x="10" y="136">+ construir(rutina, ejercicios): void</text>
+  </g>
+
+  <!-- Nota del Director (Construir) -->
+  <circle cx="300" cy="402" r="4" fill="#fff" stroke="#000"/>
+  <line x1="300" y1="406" x2="300" y2="480" stroke="#000"/>
+  <g transform="translate(30,480)" font-family="Consolas, 'Courier New', monospace" font-size="12">
+    <path d="M0,0 H546 L560,14 V112 H0 Z" fill="#fff" stroke="#000"/>
+    <path d="M546,0 V14 H560" fill="none" stroke="#000"/>
+    <text x="10" y="24">constructor-&gt;reiniciar()</text>
+    <text x="10" y="42">constructor-&gt;construirDatos(nombre, descripcion, nivel, categoriaId)</text>
+    <text x="10" y="60">para todos los ejercicios marcados {</text>
+    <text x="38" y="78">constructor-&gt;construirEjercicio(id, series, repeticiones, orden)</text>
+    <text x="10" y="96">}</text>
+  </g>
+
+  <!-- Agregación Director ◇—constructor—> Constructor -->
+  <line x1="588" y1="300" x2="698" y2="300" stroke="#000" marker-end="url(#abierta)"/>
+  <path d="M560,300 L574,293 L588,300 L574,307 Z" fill="#fff" stroke="#000"/>
+  <text x="626" y="291">constructor</text>
+
+  <!-- ===== Constructor (abstracto) ===== -->
+  <g transform="translate(700,270)">
+    <rect width="560" height="134" fill="#fff" stroke="#000" stroke-width="1.3"/>
+    <text x="280" y="18" text-anchor="middle" font-size="11" fill="#555">«Constructor» (clase abstracta)</text>
+    <text x="280" y="38" text-anchor="middle" font-size="15" font-weight="bold" font-style="italic">RutinaBuilder</text>
+    <text x="280" y="55" text-anchor="middle" font-size="11" fill="#555">app/Patterns/Builder/RutinaBuilder.php</text>
+    <line x1="0" y1="66" x2="560" y2="66" stroke="#000"/>
+    <g font-style="italic">
+      <text x="10" y="86">+ reiniciar(): void</text>
+      <text x="10" y="104">+ construirDatos(nombre, descripcion, nivel, categoriaId): void</text>
+      <text x="10" y="122">+ construirEjercicio(ejercicioId, series, repeticiones, orden): void</text>
+    </g>
+  </g>
+
+  <!-- Generalización ConstructorConcreto —▷ Constructor -->
+  <line x1="950" y1="420" x2="950" y2="510" stroke="#000"/>
+  <path d="M950,404 L940,420 L960,420 Z" fill="#fff" stroke="#000"/>
+
+  <!-- ===== ConstructorConcreto ===== -->
+  <g transform="translate(700,510)">
+    <rect width="500" height="274" fill="#fff" stroke="#000" stroke-width="1.3"/>
+    <text x="250" y="18" text-anchor="middle" font-size="11" fill="#555">«ConstructorConcreto»</text>
+    <text x="250" y="38" text-anchor="middle" font-size="15" font-weight="bold">RutinaArmadaBuilder</text>
+    <text x="250" y="55" text-anchor="middle" font-size="11" fill="#555">app/Patterns/Builder/RutinaArmadaBuilder.php</text>
+    <line x1="0" y1="66" x2="500" y2="66" stroke="#000"/>
+    <text x="10" y="86">- resultado: RutinaArmada</text>
+    <text x="10" y="104">- error: ?string</text>
+    <text x="10" y="122">- idsCategorias: int[]</text>
+    <text x="10" y="140">- idsEjercicios: int[]</text>
+    <line x1="0" y1="152" x2="500" y2="152" stroke="#000"/>
+    <text x="10" y="172">+ __construct(categorias, catalogo)</text>
+    <text x="10" y="190">+ reiniciar(): void</text>
+    <text x="10" y="208">+ construirDatos(nombre, descripcion, nivel, categoriaId): void</text>
+    <text x="10" y="226">+ construirEjercicio(ejercicioId, series, repeticiones, orden): void</text>
+    <text x="10" y="244">+ obtenerResultado(): RutinaArmada</text>
+    <text x="10" y="262">+ obtenerError(): ?string</text>
+  </g>
+
+  <!-- ConstructorConcreto ——> Producto -->
+  <line x1="1200" y1="600" x2="1278" y2="600" stroke="#000" marker-end="url(#abierta)"/>
+
+  <!-- ===== Producto ===== -->
+  <g transform="translate(1280,510)">
+    <rect width="440" height="274" fill="#fff" stroke="#000" stroke-width="1.3"/>
+    <text x="220" y="18" text-anchor="middle" font-size="11" fill="#555">«Producto»</text>
+    <text x="220" y="38" text-anchor="middle" font-size="15" font-weight="bold">RutinaArmada</text>
+    <text x="220" y="55" text-anchor="middle" font-size="11" fill="#555">app/Patterns/Builder/RutinaArmada.php</text>
+    <line x1="0" y1="66" x2="440" y2="66" stroke="#000"/>
+    <text x="10" y="86">- nombre: string</text>
+    <text x="10" y="104">- descripcion: ?string</text>
+    <text x="10" y="122">- nivel: ?string</text>
+    <text x="10" y="140">- categoriaId: int</text>
+    <text x="10" y="158">- ejercicios: array</text>
+    <line x1="0" y1="170" x2="440" y2="170" stroke="#000"/>
+    <text x="10" y="190">+ establecerDatos(nombre, descripcion, nivel, categoriaId): void</text>
+    <text x="10" y="208">+ agregarEjercicio(ejercicioId, series, repeticiones, orden): void</text>
+    <text x="10" y="226">+ nombre() / descripcion() / nivel() / categoriaId()</text>
+    <text x="10" y="244">+ ejercicios(): array</text>
+    <text x="10" y="262">+ datos(): array</text>
+  </g>
+</svg>

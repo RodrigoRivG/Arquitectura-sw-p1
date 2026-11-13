@@ -9,6 +9,8 @@ use App\Models\Categoria;
 use App\Models\Ejercicio;
 use App\Models\Rutina;
 use App\Models\RutinaEjercicio;
+use App\Patterns\Builder\RutinaArmadaBuilder;
+use App\Patterns\Builder\RutinaDirector;
 
 class RutinaController extends Controller
 {
@@ -38,15 +40,15 @@ class RutinaController extends Controller
         $catalogo = $this->ejercicio->seleccionar();
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $datos = $this->datosDelFormulario();
-            $error = $this->validar($datos, $categorias, $catalogo);
+            $constructor = $this->armarRutina($categorias, $catalogo, $_POST, (array) ($_POST['ejercicios'] ?? []));
+            $rutinaArmada = $constructor->obtenerResultado();
 
-            if ($error !== null) {
-                $this->mostrarFormulario($datos, $categorias, $catalogo, $datos['ejercicios'], $error);
+            if ($constructor->obtenerError() !== null) {
+                $this->mostrarFormulario($rutinaArmada->datos(), $categorias, $catalogo, $rutinaArmada->ejercicios(), $constructor->obtenerError());
                 return;
             }
 
-            $this->rutina->insertar($datos['nombre'], $datos['descripcion'], $datos['nivel'], $datos['categoria_id'], $datos['ejercicios']);
+            $this->rutina->insertar($rutinaArmada);
             $this->redirect('index.php?controller=rutina&action=listar');
             return;
         }
@@ -69,21 +71,24 @@ class RutinaController extends Controller
         $catalogo = $this->ejercicio->seleccionar();
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $datos = $this->datosDelFormulario();
-            $error = $this->validar($datos, $categorias, $catalogo);
+            $constructor = $this->armarRutina($categorias, $catalogo, $_POST, (array) ($_POST['ejercicios'] ?? []));
+            $rutinaArmada = $constructor->obtenerResultado();
 
-            if ($error !== null) {
-                $datos['id'] = $id;
-                $this->mostrarFormulario($datos, $categorias, $catalogo, $datos['ejercicios'], $error);
+            if ($constructor->obtenerError() !== null) {
+                $this->mostrarFormulario($rutinaArmada->datos() + ['id' => $id], $categorias, $catalogo, $rutinaArmada->ejercicios(), $constructor->obtenerError());
                 return;
             }
 
-            $this->rutina->actualizar($id, $datos['nombre'], $datos['descripcion'], $datos['nivel'], $datos['categoria_id'], $datos['ejercicios']);
+            $this->rutina->actualizar($id, $rutinaArmada);
             $this->redirect('index.php?controller=rutina&action=listar');
             return;
         }
 
-        $this->mostrarFormulario($rutina, $categorias, $catalogo, $this->asignadosDeRutina($id), null);
+        // Precarga: la rutina guardada se arma con el mismo Director/Builder, a partir de la BD.
+        $rutinaArmada = $this->armarRutina($categorias, $catalogo, $rutina, $this->rutinaEjercicio->seleccionarPorRutina($id))
+            ->obtenerResultado();
+
+        $this->mostrarFormulario($rutinaArmada->datos() + ['id' => $id], $categorias, $catalogo, $rutinaArmada->ejercicios(), null);
     }
 
     public function eliminar(): void
@@ -91,6 +96,19 @@ class RutinaController extends Controller
         $id = (int) ($_GET['id'] ?? 0);
         $this->rutina->eliminar($id);
         $this->redirect('index.php?controller=rutina&action=listar');
+    }
+
+    /**
+     * Cliente del patrón Builder: crea el constructor concreto, se lo entrega al Director,
+     * le pide construir y devuelve el constructor para obtener el resultado (y el error, si hubo).
+     */
+    private function armarRutina(array $categorias, array $catalogo, array $rutina, array $ejercicios): RutinaArmadaBuilder
+    {
+        $constructor = new RutinaArmadaBuilder($categorias, $catalogo);
+        $director = new RutinaDirector($constructor);
+        $director->construir($rutina, $ejercicios);
+
+        return $constructor;
     }
 
     private function mostrarFormulario(?array $rutina, array $categorias, array $catalogo, array $asignados, ?string $error): void
@@ -102,94 +120,5 @@ class RutinaController extends Controller
             'asignados' => $asignados,
             'error' => $error,
         ]);
-    }
-
-    /**
-     * Ejercicios ya asignados a la rutina, indexados por ejercicio_id
-     * (mismo formato que produce ejerciciosDelFormulario()).
-     */
-    private function asignadosDeRutina(int $rutinaId): array
-    {
-        $asignados = [];
-
-        foreach ($this->rutinaEjercicio->seleccionarPorRutina($rutinaId) as $fila) {
-            $asignados[(int) $fila['ejercicio_id']] = [
-                'series' => $fila['series'],
-                'repeticiones' => $fila['repeticiones'],
-                'orden' => $fila['orden'],
-            ];
-        }
-
-        return $asignados;
-    }
-
-    private function datosDelFormulario(): array
-    {
-        return [
-            'nombre' => trim((string) ($_POST['nombre'] ?? '')),
-            'descripcion' => trim((string) ($_POST['descripcion'] ?? '')) ?: null,
-            'nivel' => trim((string) ($_POST['nivel'] ?? '')) ?: null,
-            'categoria_id' => (int) ($_POST['categoria_id'] ?? 0),
-            'ejercicios' => $this->ejerciciosDelFormulario(),
-        ];
-    }
-
-    /**
-     * Solo se toman los ejercicios marcados en el formulario.
-     * Resultado: [ejercicio_id => ['series' => ?int, 'repeticiones' => ?int, 'orden' => ?int]]
-     */
-    private function ejerciciosDelFormulario(): array
-    {
-        $ejercicios = [];
-
-        foreach ((array) ($_POST['ejercicios'] ?? []) as $ejercicioId => $campos) {
-            if (!is_array($campos) || !isset($campos['incluir'])) {
-                continue;
-            }
-
-            $ejercicios[(int) $ejercicioId] = [
-                'series' => $this->intOpcional((string) ($campos['series'] ?? '')),
-                'repeticiones' => $this->intOpcional((string) ($campos['repeticiones'] ?? '')),
-                'orden' => $this->intOpcional((string) ($campos['orden'] ?? '')),
-            ];
-        }
-
-        return $ejercicios;
-    }
-
-    private function intOpcional(string $valor): ?int
-    {
-        $valor = trim($valor);
-
-        return $valor === '' ? null : (int) $valor;
-    }
-
-    private function validar(array $datos, array $categorias, array $catalogo): ?string
-    {
-        if ($datos['nombre'] === '') {
-            return 'El nombre es obligatorio.';
-        }
-
-        $idsCategorias = array_map('intval', array_column($categorias, 'id'));
-
-        if (!in_array($datos['categoria_id'], $idsCategorias, true)) {
-            return 'Debe seleccionar una categoría válida.';
-        }
-
-        $idsEjercicios = array_map('intval', array_column($catalogo, 'id'));
-
-        foreach ($datos['ejercicios'] as $ejercicioId => $campos) {
-            if (!in_array($ejercicioId, $idsEjercicios, true)) {
-                return 'Se seleccionó un ejercicio que no existe en el catálogo.';
-            }
-
-            foreach (['series', 'repeticiones', 'orden'] as $campo) {
-                if ($campos[$campo] !== null && $campos[$campo] < 0) {
-                    return 'Series, repeticiones y orden no pueden ser negativos.';
-                }
-            }
-        }
-
-        return null;
     }
 }
