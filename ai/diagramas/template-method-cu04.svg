@@ -1,0 +1,138 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1560" height="850" viewBox="0 0 1560 850" font-family="Arial, Helvetica, sans-serif" font-size="13">
+  <defs>
+    <marker id="abierta" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="12" markerHeight="12" orient="auto-start-reverse">
+      <path d="M1,1 L11,6 L1,11" fill="none" stroke="#000" stroke-width="1.3"/>
+    </marker>
+  </defs>
+  <rect width="1560" height="850" fill="#fff"/>
+
+  <text x="40" y="34" font-size="20" font-weight="bold">Template Method (GoF) aplicado al CU-04 Gestionar ejercicios</text>
+
+  <!-- ===== Controller (Core) ===== -->
+  <g transform="translate(40,60)">
+    <rect width="380" height="116" fill="#fff" stroke="#000" stroke-width="1.3"/>
+    <text x="190" y="18" text-anchor="middle" font-size="11" fill="#555">«abstract» (base del MVC)</text>
+    <text x="190" y="38" text-anchor="middle" font-size="15" font-weight="bold" font-style="italic">Controller</text>
+    <text x="190" y="55" text-anchor="middle" font-size="11" fill="#555">app/Core/Controller.php</text>
+    <line x1="0" y1="66" x2="380" y2="66" stroke="#000"/>
+    <text x="10" y="86"># render(view, data): void</text>
+    <text x="10" y="104"># redirect(url): void</text>
+  </g>
+
+  <!-- GuardarEjercicio —▷ Controller -->
+  <line x1="230" y1="192" x2="230" y2="250" stroke="#000"/>
+  <path d="M230,176 L220,192 L240,192 Z" fill="#fff" stroke="#000"/>
+
+  <!-- ===== Modelo Ejercicio ===== -->
+  <g transform="translate(700,60)">
+    <rect width="500" height="132" fill="#fff" stroke="#000" stroke-width="1.3"/>
+    <text x="250" y="18" text-anchor="middle" font-size="11" fill="#555">«model»</text>
+    <text x="250" y="38" text-anchor="middle" font-size="15" font-weight="bold">Ejercicio</text>
+    <text x="250" y="55" text-anchor="middle" font-size="11" fill="#555">app/Models/Ejercicio.php</text>
+    <line x1="0" y1="66" x2="500" y2="66" stroke="#000"/>
+    <text x="10" y="86">+ buscarPorId(id): ?array</text>
+    <text x="10" y="104">+ insertar(nombre, descripcion, videoTitulo, videoUrl): int</text>
+    <text x="10" y="122">+ actualizar(id, nombre, descripcion, videoTitulo, videoUrl): void</text>
+  </g>
+
+  <!-- GuardarEjercicio —modelo—> Ejercicio -->
+  <polyline points="600,270 650,270 650,130 698,130" fill="none" stroke="#000" marker-end="url(#abierta)"/>
+  <text x="604" y="262">modelo</text>
+
+  <!-- ===== ClaseAbstracta ===== -->
+  <g transform="translate(40,250)">
+    <rect width="560" height="290" fill="#fff" stroke="#000" stroke-width="1.3"/>
+    <text x="280" y="18" text-anchor="middle" font-size="11" fill="#555">«ClaseAbstracta»</text>
+    <text x="280" y="38" text-anchor="middle" font-size="15" font-weight="bold" font-style="italic">GuardarEjercicio</text>
+    <text x="280" y="55" text-anchor="middle" font-size="11" fill="#555">app/Patterns/TemplateMethod/GuardarEjercicio.php</text>
+    <line x1="0" y1="66" x2="560" y2="66" stroke="#000"/>
+    <text x="10" y="86"># modelo: Ejercicio</text>
+    <text x="10" y="104"># ejercicioActual: ?array</text>
+    <line x1="0" y1="116" x2="560" y2="116" stroke="#000"/>
+    <text x="10" y="134">+ __construct(modelo: Ejercicio)</text>
+    <text x="10" y="152" font-weight="bold">+ ejecutar(): void  {final}</text>
+    <text x="230" y="152" font-size="11" fill="#555">← MetodoPlantilla</text>
+    <text x="10" y="170" font-style="italic"># cargarEjercicio(): bool</text>
+    <text x="230" y="170" font-size="11" fill="#555">← OperacionPrimitiva1</text>
+    <text x="10" y="188" font-style="italic"># persistir(datos: array): void</text>
+    <text x="230" y="188" font-size="11" fill="#555">← OperacionPrimitiva2</text>
+    <text x="10" y="206"># leerFormulario(): array</text>
+    <text x="10" y="224"># validar(datos: array): ?string</text>
+    <text x="10" y="242"># mostrarFormulario(ejercicio, error): void</text>
+    <text x="10" y="260"># redirigir(): void</text>
+    <text x="10" y="278">- urlValida(url: string): bool</text>
+  </g>
+
+  <!-- Nota del método plantilla -->
+  <circle cx="530" cy="398" r="4" fill="#fff" stroke="#000"/>
+  <line x1="534" y1="398" x2="700" y2="398" stroke="#000"/>
+  <g transform="translate(700,330)" font-family="Consolas, 'Courier New', monospace" font-size="12">
+    <path d="M0,0 H586 L600,14 V150 H0 Z" fill="#fff" stroke="#000"/>
+    <path d="M586,0 V14 H600" fill="none" stroke="#000"/>
+    <text x="10" y="24">if (!<tspan font-style="italic" font-weight="bold">cargarEjercicio()</tspan>) return;</text>
+    <text x="10" y="42">if (GET) { mostrarFormulario(ejercicioActual, null); return; }</text>
+    <text x="10" y="60">datos = leerFormulario();</text>
+    <text x="10" y="78">error = validar(datos);</text>
+    <text x="10" y="96">if (error) { mostrarFormulario(datos, error); return; }</text>
+    <text x="10" y="114"><tspan font-style="italic" font-weight="bold">persistir(datos)</tspan>;</text>
+    <text x="10" y="132">redirigir();</text>
+  </g>
+
+  <!-- Generalización ClasesConcretas —▷ ClaseAbstracta -->
+  <path d="M320,540 L310,556 L330,556 Z" fill="#fff" stroke="#000"/>
+  <line x1="320" y1="556" x2="320" y2="590" stroke="#000"/>
+  <line x1="210" y1="590" x2="610" y2="590" stroke="#000"/>
+  <line x1="210" y1="590" x2="210" y2="620" stroke="#000"/>
+  <line x1="610" y1="590" x2="610" y2="620" stroke="#000"/>
+
+  <!-- ===== ClaseConcreta: CrearEjercicio ===== -->
+  <g transform="translate(40,620)">
+    <rect width="340" height="116" fill="#fff" stroke="#000" stroke-width="1.3"/>
+    <text x="170" y="18" text-anchor="middle" font-size="11" fill="#555">«ClaseConcreta»</text>
+    <text x="170" y="38" text-anchor="middle" font-size="15" font-weight="bold">CrearEjercicio</text>
+    <text x="170" y="55" text-anchor="middle" font-size="11" fill="#555">app/Patterns/TemplateMethod/CrearEjercicio.php</text>
+    <line x1="0" y1="66" x2="340" y2="66" stroke="#000"/>
+    <text x="10" y="86"># cargarEjercicio(): bool</text>
+    <text x="10" y="104"># persistir(datos: array): void</text>
+  </g>
+
+  <!-- ===== ClaseConcreta: EditarEjercicio ===== -->
+  <g transform="translate(420,620)">
+    <rect width="380" height="166" fill="#fff" stroke="#000" stroke-width="1.3"/>
+    <text x="190" y="18" text-anchor="middle" font-size="11" fill="#555">«ClaseConcreta»</text>
+    <text x="190" y="38" text-anchor="middle" font-size="15" font-weight="bold">EditarEjercicio</text>
+    <text x="190" y="55" text-anchor="middle" font-size="11" fill="#555">app/Patterns/TemplateMethod/EditarEjercicio.php</text>
+    <line x1="0" y1="66" x2="380" y2="66" stroke="#000"/>
+    <text x="10" y="86">- id: int</text>
+    <line x1="0" y1="98" x2="380" y2="98" stroke="#000"/>
+    <text x="10" y="118">+ __construct(modelo: Ejercicio, id: int)</text>
+    <text x="10" y="136"># cargarEjercicio(): bool</text>
+    <text x="10" y="154"># persistir(datos: array): void</text>
+  </g>
+
+  <!-- ===== Cliente ===== -->
+  <g transform="translate(1000,620)">
+    <rect width="480" height="116" fill="#fff" stroke="#000" stroke-width="1.3"/>
+    <text x="240" y="18" text-anchor="middle" font-size="11" fill="#555">«Cliente»</text>
+    <text x="240" y="38" text-anchor="middle" font-size="15" font-weight="bold">EjercicioController</text>
+    <text x="240" y="55" text-anchor="middle" font-size="11" fill="#555">app/Controllers/EjercicioController.php</text>
+    <line x1="0" y1="66" x2="480" y2="66" stroke="#000"/>
+    <text x="10" y="86">+ crear(): void</text>
+    <text x="10" y="104">+ editar(): void</text>
+  </g>
+
+  <!-- Nota del Cliente -->
+  <g transform="translate(1000,515)" font-family="Consolas, 'Courier New', monospace" font-size="12">
+    <path d="M0,0 H466 L480,14 V64 H0 Z" fill="#fff" stroke="#000"/>
+    <path d="M466,0 V14 H480" fill="none" stroke="#000"/>
+    <text x="10" y="24">crear():  (new CrearEjercicio($this-&gt;ejercicio))-&gt;ejecutar();</text>
+    <text x="10" y="44">editar(): (new EditarEjercicio($this-&gt;ejercicio, $id))-&gt;ejecutar();</text>
+  </g>
+  <line x1="1240" y1="579" x2="1240" y2="620" stroke="#000" stroke-dasharray="4 3"/>
+
+  <!-- Cliente «crea» las clases concretas -->
+  <line x1="1000" y1="680" x2="802" y2="680" stroke="#000" stroke-dasharray="6 4" marker-end="url(#abierta)"/>
+  <text x="870" y="672" font-size="11" fill="#555">«crea»</text>
+  <polyline points="1000,715 950,715 950,815 210,815 210,738" fill="none" stroke="#000" stroke-dasharray="6 4" marker-end="url(#abierta)"/>
+  <text x="560" y="808" font-size="11" fill="#555">«crea»</text>
+</svg>
